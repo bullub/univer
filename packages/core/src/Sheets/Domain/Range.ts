@@ -3139,6 +3139,7 @@ export class Range {
                     [startColumn]: value,
                 },
             },
+            // set the operation type for modifying cell data to default (it includes undo)
             operation: ActionOperationType.DEFAULT_ACTION,
         };
         const command = new Command(
