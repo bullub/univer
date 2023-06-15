@@ -12,7 +12,12 @@ import {
     SetRangeStyleAction,
 } from '../Action';
 
-import { CommandManager, ISheetActionData, Command } from '../../Command';
+import {
+    CommandManager,
+    ISheetActionData,
+    Command,
+    ActionOperationType,
+} from '../../Command';
 
 import { DEFAULT_RANGE, DEFAULT_STYLES, ACTION_NAMES } from '../../Const';
 
@@ -3134,6 +3139,7 @@ export class Range {
                     [startColumn]: value,
                 },
             },
+            operation: ActionOperationType.DEFAULT_ACTION,
         };
         const command = new Command(
             {

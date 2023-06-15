@@ -83,14 +83,11 @@ export function SetRangeDataApply(unit: CommandUnit, data: ISetRangeDataActionDa
             if (value.p != null) {
                 cell.p = value.p;
             }
-            if (value.v != null) {
-                cell.v = value.v;
-            }
-            if (value.m != null) {
-                cell.m = value.m;
-            } else {
-                cell.m = String(cell.v);
-            }
+
+            // When undoing, the cell may have a null value state before it
+            cell.v = value.v || '';
+            cell.m = value.m || String(cell.v);
+
             if (value.t != null) {
                 cell.t = value.t;
             }
