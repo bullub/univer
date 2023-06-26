@@ -921,7 +921,7 @@ export class SelectionManager {
     private _rowEventInitial() {
         const row = this._rowComponent;
         row.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            // this._rowTitleControl.highlightRowTitle(evt);
+            this._rowTitleControl.highlightRowTitle(evt);
         });
     }
 

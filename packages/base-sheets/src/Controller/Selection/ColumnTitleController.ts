@@ -55,8 +55,7 @@ export class ColumnTitleController {
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const containerOffsetLeft = (e.target as HTMLCanvasElement).getBoundingClientRect().left;
-        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - containerOffsetLeft;
+        const clientX = e.offsetX + scrollXY.x - this._leftTopWidth;
         const columnWidthAccumulation = main.getSkeleton()?.columnWidthAccumulation ?? [];
 
         for (let i = 0; i < columnWidthAccumulation?.length; i++) {
@@ -88,6 +87,8 @@ export class ColumnTitleController {
             });
             this._manager.getDragLineControl().dragDown(e);
         }
+
+        this.highlightColumn();
     }
 
     setColumnWidth(width: Nullable<number>) {
@@ -123,8 +124,7 @@ export class ColumnTitleController {
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const containerOffsetLeft = (e.target as HTMLCanvasElement).getBoundingClientRect().left;
-        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - containerOffsetLeft;
+        const clientX = e.offsetX + scrollXY.x - this._leftTopWidth;
         const columnWidthAccumulation = main.getSkeleton()?.columnWidthAccumulation ?? [];
 
         for (let i = 0; i < columnWidthAccumulation?.length; i++) {

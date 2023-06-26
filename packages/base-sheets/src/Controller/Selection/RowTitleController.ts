@@ -1,5 +1,5 @@
 import { CURSOR_TYPE, Group, IMouseEvent, IPointerEvent, Rect } from '@univerjs/base-render';
-import { Nullable } from '@univerjs/core';
+import { EventState, Nullable } from '@univerjs/core';
 import { DragLineDirection } from './DragLineController';
 import { SelectionManager } from './SelectionManager';
 
@@ -56,8 +56,7 @@ export class RowTitleController {
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const contentRef = this._manager.getPlugin().getSheetContainerControl().getContentRef();
-        const clientY = e.clientY + scrollXY.y - this._leftTopHeight - contentRef.current!.getBoundingClientRect().top;
+        const clientY = e.offsetY + scrollXY.y - this._leftTopHeight;
         const rowHeightAccumulation = main.getSkeleton()?.rowHeightAccumulation ?? [];
 
         for (let i = 0; i < rowHeightAccumulation?.length; i++) {
@@ -81,7 +80,12 @@ export class RowTitleController {
                 direction: DragLineDirection.HORIZONTAL,
                 end,
                 start,
-                dragUp: this.setRowHeight.bind(this),
+                dragUp: (height, evt) => {
+                    this._Item.resetCursor();
+                    this.setRowHeight(height);
+                    this.highlightRowTitle(evt);
+                    this._highlightItem.hide();
+                },
             });
             this._manager.getDragLineControl().dragDown(e);
         }
@@ -123,8 +127,8 @@ export class RowTitleController {
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const contentRef = this._manager.getPlugin().getSheetContainerControl().getContentRef();
-        const clientY = e.clientY + scrollXY.y - this._leftTopHeight - contentRef.current!.getBoundingClientRect().top;
+        // const contentRef = this._manager.getPlugin().getSheetContainerControl();
+        const clientY = e.offsetY + scrollXY.y - this._leftTopHeight;
         const rowHeightAccumulation = main.getSkeleton()?.rowHeightAccumulation ?? [];
 
         for (let i = 0; i < rowHeightAccumulation?.length; i++) {
@@ -162,19 +166,22 @@ export class RowTitleController {
         this._highlightItem.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._highlightItem.show();
         });
-        this._highlightItem.onPointerMoveObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            this._highlightItem.show();
-        });
         this._highlightItem.onPointerLeaveObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._highlightItem.hide();
         });
-        this._Item.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            this._Item.cursor = CURSOR_TYPE.ROW_RESIZE;
+        this._highlightItem.onPointerDownObserver.add(() => {
+            this.highlightRow();
+        });
+        this._Item.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent, eventState: EventState) => {
+            eventState.isStopPropagation = true;
+            this._Item.setCursor(CURSOR_TYPE.ROW_RESIZE);
+            this._highlightItem.hide();
         });
         this._Item.onPointerLeaveObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._Item.resetCursor();
         });
-        this._Item.onPointerDownObserver.add((evt: IPointerEvent | IMouseEvent) => {
+        this._Item.onPointerDownObserver.add((evt: IPointerEvent | IMouseEvent, eventState: EventState) => {
+            eventState.isStopPropagation = true;
             this.pointerDown(evt);
         });
     }
