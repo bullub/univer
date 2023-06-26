@@ -1,5 +1,5 @@
 import { CURSOR_TYPE, Group, IMouseEvent, IPointerEvent, Rect } from '@univerjs/base-render';
-import { Nullable } from '@univerjs/core';
+import { EventState, Nullable } from '@univerjs/core';
 import { DragLineDirection } from './DragLineController';
 import { SelectionManager } from './SelectionManager';
 
@@ -49,13 +49,14 @@ export class ColumnTitleController {
     }
 
     pointerDown(e: IPointerEvent | IMouseEvent) {
+        console.log('pointerDown');
         const main = this._manager.getMainComponent();
         const { offsetX: evtOffsetX, offsetY: evtOffsetY } = e;
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const contentRef = this._manager.getPlugin().getSheetContainerControl().getContentRef();
-        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - contentRef.current!.getBoundingClientRect().left;
+        const containerOffsetLeft = (e.target as HTMLCanvasElement).getBoundingClientRect().left;
+        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - containerOffsetLeft;
         const columnWidthAccumulation = main.getSkeleton()?.columnWidthAccumulation ?? [];
 
         for (let i = 0; i < columnWidthAccumulation?.length; i++) {
@@ -79,14 +80,14 @@ export class ColumnTitleController {
                 end,
                 start,
                 dragUp: (width, e) => {
+                    this._Item.resetCursor();
                     this.setColumnWidth(width);
                     this.highlightColumnTitle(e);
+                    this._highlightItem.hide();
                 },
             });
             this._manager.getDragLineControl().dragDown(e);
         }
-        // 高亮当前列
-        this.highlightColumn();
     }
 
     setColumnWidth(width: Nullable<number>) {
@@ -97,7 +98,6 @@ export class ColumnTitleController {
         } else {
             sheet.setColumnWidth(this._index, 1, width! + this._currentWidth);
         }
-        this.highlightColumn();
     }
 
     highlightColumn() {
@@ -123,8 +123,8 @@ export class ColumnTitleController {
         this._startOffsetX = evtOffsetX;
         this._startOffsetY = evtOffsetY;
         const scrollXY = main.getAncestorScrollXY(this._startOffsetX, this._startOffsetY);
-        const contentRef = this._manager.getPlugin().getSheetContainerControl().getContentRef();
-        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - contentRef.current!.getBoundingClientRect().left;
+        const containerOffsetLeft = (e.target as HTMLCanvasElement).getBoundingClientRect().left;
+        const clientX = e.clientX + scrollXY.x - this._leftTopWidth - containerOffsetLeft;
         const columnWidthAccumulation = main.getSkeleton()?.columnWidthAccumulation ?? [];
 
         for (let i = 0; i < columnWidthAccumulation?.length; i++) {
@@ -162,19 +162,22 @@ export class ColumnTitleController {
         this._highlightItem.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._highlightItem.show();
         });
-        this._highlightItem.onPointerMoveObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            this._highlightItem.show();
-        });
         this._highlightItem.onPointerLeaveObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._highlightItem.hide();
         });
-        this._Item.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            this._Item.cursor = CURSOR_TYPE.COLUMN_RESIZE;
+        this._highlightItem.onPointerDownObserver.add(() => {
+            this.highlightColumn();
+        });
+        this._Item.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent, eventState: EventState) => {
+            eventState.isStopPropagation = true;
+            this._Item.setCursor(CURSOR_TYPE.COLUMN_RESIZE);
+            this._highlightItem.hide();
         });
         this._Item.onPointerLeaveObserver.add((evt: IPointerEvent | IMouseEvent) => {
             this._Item.resetCursor();
         });
-        this._Item.onPointerDownObserver.add((evt: IPointerEvent | IMouseEvent) => {
+        this._Item.onPointerDownObserver.add((evt: IPointerEvent | IMouseEvent, eventState: EventState) => {
+            eventState.isStopPropagation = true;
             this.pointerDown(evt);
         });
     }

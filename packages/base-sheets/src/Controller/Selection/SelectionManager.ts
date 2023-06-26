@@ -928,7 +928,7 @@ export class SelectionManager {
     private _columnEventInitial() {
         const column = this._columnComponent;
         column.onPointerEnterObserver.add((evt: IPointerEvent | IMouseEvent) => {
-            // this._columnTitleControl.highlightColumnTitle(evt);
+            this._columnTitleControl.highlightColumnTitle(evt);
         });
     }
 
