@@ -7,6 +7,7 @@ import { OperationPlugin } from '@univerjs/sheets-plugin-operation';
 import { ImportXlsxPlugin } from '@univerjs/sheets-plugin-import-xlsx';
 import { OverGridImagePlugin } from '@univerjs/sheets-plugin-image';
 import { FindPlugin } from '@univerjs/sheets-plugin-find';
+import { GcExcelPlugin } from '@univerjs/sheets-plugin-gcexcel';
 
 const uiDefaultConfigDemo = {
     container: 'universheet',
@@ -70,4 +71,5 @@ univer.install(
 FindPlugin.create().installTo(universheet);
 universheet.installPlugin(new OperationPlugin());
 universheet.installPlugin(new ImportXlsxPlugin());
+universheet.installPlugin(new GcExcelPlugin());
 universheet.installPlugin(new OverGridImagePlugin());
