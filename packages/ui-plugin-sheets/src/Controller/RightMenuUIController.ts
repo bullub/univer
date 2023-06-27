@@ -15,6 +15,8 @@ interface CustomLabelProps {
     label?: string;
     children?: CustomLabelProps[];
     onKeyUp?: (e: Event) => void;
+    getPlaceholder?: () => string;
+    getInputValue?: () => string;
 }
 
 export interface CustomLabel{
@@ -123,6 +125,8 @@ export class RightMenuUIController {
                         prefix: 'rightClick.rowHeight',
                         suffix: 'px',
                         onKeyUp: this.setRowHeight.bind(this),
+                        getPlaceholder: this.getRowHeight.bind(this),
+                        getInputValue: this.getRowHeight.bind(this),
                     },
                 },
                 onClick: () => {},
@@ -144,6 +148,8 @@ export class RightMenuUIController {
                         prefix: 'rightClick.columnWidth',
                         suffix: 'px',
                         onKeyUp: this.setColumnWidth.bind(this),
+                        getPlaceholder: this.getColumnWidth.bind(this),
+                        getInputValue: this.getColumnWidth.bind(this),
                     },
                 },
                 // show: this._config.ColumnWidth,
@@ -334,14 +340,27 @@ export class RightMenuUIController {
         this.setUIObserve(msg);
     }
 
+    getRowHeight() {
+        const workSheet = this._plugin.getContext().getUniver().getCurrentUniverSheetInstance().getWorkBook().getActiveSheet();
+        const defaultHeight = workSheet.getConfig().defaultRowHeight;
+        let height = defaultHeight.toString();
+        const selectionManager = this._sheetPlugin.getSelectionManager();
+        const selectionCell = selectionManager.getCurrentModel();
+        if (selectionCell && selectionCell.startRow === selectionCell.endRow) {
+            height = workSheet.getRowHeight(selectionCell.startRow).toString();
+        }
+        return height;
+    }
+
     setRowHeight(e: Event) {
         console.dir(this._plugin.getContext().getUniver().getCurrentUniverSheetInstance().getWorkBook().getActiveSheet().getConfig());
         console.dir(this._plugin.getContext().getUniver().getCurrentUniverSheetInstance().getWorkBook().getStyles());
 
-        if ((e as KeyboardEvent).key !== 'Enter') {
-            return;
-        }
+        // if ((e as KeyboardEvent).key !== 'Enter') {
+        //     return;
+        // }
         const height = (e.target as HTMLInputElement).value;
+        if (Number(height) <= 0) return;
         const msg = {
             name: 'setRowHeight',
             value: height,
@@ -349,11 +368,24 @@ export class RightMenuUIController {
         this.setUIObserve(msg);
     }
 
-    setColumnWidth(e: Event) {
-        if ((e as KeyboardEvent).key !== 'Enter') {
-            return;
+    getColumnWidth() {
+        const workSheet = this._plugin.getContext().getUniver().getCurrentUniverSheetInstance().getWorkBook().getActiveSheet();
+        const defaultWidth = workSheet.getConfig().defaultColumnWidth;
+        let width = defaultWidth.toString();
+        const selectionManager = this._sheetPlugin.getSelectionManager();
+        const selectionCell = selectionManager.getCurrentModel();
+        if (selectionCell && selectionCell.startColumn === selectionCell.endColumn) {
+            width = workSheet.getColumnWidth(selectionCell.startColumn).toString();
         }
+        return width;
+    }
+
+    setColumnWidth(e: Event) {
+        // if ((e as KeyboardEvent).key !== 'Enter') {
+        //     return;
+        // }
         const width = (e.target as HTMLInputElement).value;
+        if (Number(width) <= 0) return;
         const msg = {
             name: 'setColumnWidth',
             value: width,

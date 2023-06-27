@@ -4,6 +4,8 @@ interface IProps {
     prefix: string;
     suffix: string;
     onKeyUp?: (e: Event) => void;
+    getPlaceholder?: () => string;
+    getInputValue?: () => string;
 }
 
 export class RightMenuInput extends Component<IProps> {
@@ -17,11 +19,11 @@ export class RightMenuInput extends Component<IProps> {
     }
 
     render() {
-        const { prefix, suffix } = this.props;
+        const { prefix, suffix, getPlaceholder, getInputValue } = this.props;
         return (
             <div>
                 {this.getLabel(prefix)}
-                <Input onPressEnter={this.handleKeyUp.bind(this)} type="number" placeholder="1" onClick={this.handleClick}></Input>
+                <Input onChange={this.handleKeyUp.bind(this)} type="number" placeholder={getPlaceholder?.()} value={getInputValue?.()} onClick={this.handleClick}></Input>
                 {this.getLabel(suffix)}
             </div>
         );
