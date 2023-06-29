@@ -5,7 +5,7 @@ import { SheetUIPlugin } from '@univerjs/ui-plugin-sheets';
 import { DEFAULT_WORKBOOK_DATA_DEMO } from '@univerjs/common-plugin-data';
 import { OperationPlugin } from '@univerjs/sheets-plugin-operation';
 import { ImportXlsxPlugin } from '@univerjs/sheets-plugin-import-xlsx';
-import { OverGridImagePlugin } from '@univerjs/sheets-plugin-image';
+// import { OverGridImagePlugin } from '@univerjs/sheets-plugin-image';
 import { FindPlugin } from '@univerjs/sheets-plugin-find';
 import { GcExcelPlugin } from '@univerjs/sheets-plugin-gcexcel';
 
@@ -72,4 +72,4 @@ FindPlugin.create().installTo(universheet);
 universheet.installPlugin(new OperationPlugin());
 universheet.installPlugin(new ImportXlsxPlugin());
 universheet.installPlugin(new GcExcelPlugin());
-universheet.installPlugin(new OverGridImagePlugin());
+// universheet.installPlugin(new OverGridImagePlugin());

@@ -20,7 +20,7 @@ export class GcExcelController {
         this._toolButton = {
             name: GCEXCEL_PLUGIN_NAME,
             toolbarType: 1, // ToolbarType.BUTTON,
-            labelLocale: 'gcexcel.tooltip',
+            label: 'gcexcel.tooltip',
             tooltip: 'gcexcel.tooltip',
             show: true,
             onClick: () => {
