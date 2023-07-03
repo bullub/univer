@@ -218,6 +218,7 @@ export class TextSelection {
             const data = this._getRangePointData(start!, start!, documents);
             const { pointGroup, cursorList } = data;
             this._setRangeList(cursorList);
+            console.log(pointGroup, cursorList);
             pointGroup.length > 0 && this._createAndUpdateAnchor(pointGroup, documents.left, documents.top);
             return;
         }
@@ -225,6 +226,7 @@ export class TextSelection {
         const data = this._getRangePointData(start!, end!, documents);
         const { pointGroup, cursorList } = data;
         this._setRangeList(cursorList);
+        console.log(pointGroup, cursorList);
         pointGroup.length > 0 && this._createAndUpdateRange(pointGroup, documents.left, documents.top);
     }
 
@@ -330,15 +332,15 @@ export class TextSelection {
 
     private _setNodePositionState(type = NodePositionType.page, start: number, end: number, current: number) {
         if (current === start) {
-            this._currentStartState[type] = NodePositionStateType.START;
+            this._currentStartState[type as unknown as keyof ICurrentNodePositionState] = NodePositionStateType.START;
         } else {
-            this._currentStartState[type] = NodePositionStateType.NORMAL;
+            this._currentStartState[type as unknown as keyof ICurrentNodePositionState] = NodePositionStateType.NORMAL;
         }
 
         if (current === end) {
-            this._currentEndState[type] = NodePositionStateType.END;
+            this._currentEndState[type as unknown as keyof ICurrentNodePositionState] = NodePositionStateType.END;
         } else {
-            this._currentEndState[type] = NodePositionStateType.NORMAL;
+            this._currentEndState[type as unknown as keyof ICurrentNodePositionState] = NodePositionStateType.NORMAL;
         }
     }
 
@@ -346,7 +348,7 @@ export class TextSelection {
         let index = typeIndex;
         let resultState: Nullable<NodePositionStateType>;
         while (index >= 0) {
-            const type = NodePositionType[index];
+            const type = NodePositionType[index] as keyof ICurrentNodePositionState;
             let state;
             if (isStart) {
                 state = this._currentStartState[type];
@@ -374,9 +376,9 @@ export class TextSelection {
         let start_next = 0;
         let end_next = nextLength;
 
-        const type = NodePositionType[typeIndex] as unknown;
+        const type = NodePositionType[typeIndex] as keyof INodePosition;
 
-        const nextType = NodePositionType[typeIndex + 1];
+        const nextType = NodePositionType[typeIndex + 1] as keyof INodePosition;
 
         if (nextType === null || type === null) {
             return {
@@ -385,11 +387,11 @@ export class TextSelection {
             };
         }
 
-        const start = startPosition[type as NodePositionType] as number;
+        const start = startPosition[type] as number;
 
-        const end = endPosition[type as NodePositionType] as number;
+        const end = endPosition[type] as number;
 
-        this._setNodePositionState(type as NodePositionType, start, end, current);
+        this._setNodePositionState(type as unknown as NodePositionType, start, end, current);
 
         const preStartNestType = this._checkPreviousNodePositionState(typeIndex);
 
@@ -450,8 +452,8 @@ export class TextSelection {
         const keys = Object.keys(NodePositionMap);
 
         for (let key of keys) {
-            const startNodeValue = start[key] as number;
-            const endNodeValue = end[key] as number;
+            const startNodeValue = start[key as keyof INodePosition] as number;
+            const endNodeValue = end[key as keyof INodePosition] as number;
 
             if (startNodeValue !== endNodeValue) {
                 return false;
